@@ -10,7 +10,9 @@ const server = express();
 server.use(cors());
 const PORT = 3000;
 server.get('/', (req, res) => {
-    res.send("Home route");
+    const movieData=require('./Movie Data/data.json')
+    const spiderMan=new Movie(movieData.title,movieData.poster_path,movieData.overview);
+    res.send(spiderMan);
 })
 server.get('/favorite', (req, res) => {
     res.send("Welcome to favorite page");
