@@ -16,15 +16,18 @@ const cors = require('cors');
 const axios = require('axios');
 const server = express();
 server.use(cors());
+server.use(errorHandler)
 const PORT = 3000;
 require('dotenv').config();
 
 // Routes
 server.get('/', homeHandler);
 server.get('/favorite', favoriteHandler)
-server.get('error', serverErrorHandler)
+// server.get('error', serverErrorHandler)
 server.get('/trending', trendingHandler)
 server.get('/search', searchHandler)
+server.get('/genres', genreHandler)
+server.get('/person',personHandler)
 server.get('*', defaultHandler)
 
 // Handlers functions
@@ -36,40 +39,96 @@ function homeHandler(req, res) {
 function favoriteHandler(req, res) {
     res.send("Welcome to favorite page");
 }
-function serverErrorHandler(req, res) {
-    res.status(500).send("internal server error");
-}
+// function serverErrorHandler(req, res) {
+//     res.status(500).send("internal server error");
+// }
 function trendingHandler(req, res) {
-    const api_key = process.env.api_key;
-    const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${api_key}`;
-    axios.get(url)
-        .then((result) => {
-            const arr = result.data.results;
-            const trendingMovies = arr.map(function (movie) {
-                const trendingMovie = new TrendingMovie(movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview);
-                return trendingMovie;
+    try {
+        const api_key = process.env.api_key;
+        const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${api_key}`;
+        axios.get(url)
+            .then((result) => {
+                const arr = result.data.results;
+                const trendingMovies = arr.map(function (movie) {
+                    const trendingMovie = new TrendingMovie(movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview);
+                    return trendingMovie;
+                })
+                res.send(trendingMovies)
             })
-            res.send(trendingMovies)
-        })
+            .catch((err) => {
+                console.log("sorry", err);
+                res.status(500).send(err);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+
+function searchHandler(req, res) {
+    try {
+        const api_key = process.env.api_key;
+        const query_value = "man";
+        const url = `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&language=en-US&query=${query_value}&page=2`
+        axios.get(url)
+            .then((result) => { return result.data })
+            .catch((err) => {
+                console.log("sorry", err);
+                res.status(500).send(err);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+
+}
+
+function genreHandler(req, res) {
+    try {
+        const api_key = process.env.api_key;
+        const url=`https://api.themoviedb.org/3/genre/movie/list?api_key=${api_key}&language=en-US`
+        axios.get(url)
+        .then((result)=>{return result.data})
         .catch((err) => {
             console.log("sorry", err);
             res.status(500).send(err);
-})
-function searchHandler(req, res) {
-    const api_key = process.env.api_key;
-    const url = `https://api.themoviedb.org/3/search/company?api_key=${api_key}&page=1`;
-    axios.get(url)
-    .then((res)=>{})
-    .catch((err) => {
-        console.log("sorry", err);
-        res.status(500).send(err);
-    })
-    
+        })
+
+    }
+    catch (error){
+        errorHandler(error,req,res);
+    }
 }
+
+function personHandler(req, res) {
+    try {
+        const api_key = process.env.api_key;
+        const id=4;
+        const url=`https://api.themoviedb.org/3/person/${id}?api_key=${api_key}&language=en-US`
+        axios.get(url)
+        .then((result)=>{return result.data})
+        .catch((err) => {
+            console.log("sorry", err);
+            res.status(500).send(err);
+        })
+
+    }
+    catch (error){
+        errorHandler(error,req,res);
+    }
+}
+
 
 
 function defaultHandler(req, res) {
     res.status(404).send("page not found");
+}
+function errorHandler(error, req, res, next) {
+    const err = {
+        status: 500,
+        message: error
+    }
+    res.status(500).send(err);
 }
 
 //http://localhost:3000/

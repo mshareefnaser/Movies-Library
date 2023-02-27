@@ -3,7 +3,7 @@
 **Author Name**: Mohamad Shareef Naser
 
 ## WRRC
-![alt text](./images/lab11.PNG)
+![alt text](./images/lab12.PNG)
 ## Overview
 A movies library that provide data about movies, it also have a favorite page to keep your favorite movies in one place.
 ## Getting Started
@@ -14,9 +14,13 @@ A movies library that provide data about movies, it also have a favorite page to
 - go to browser:
     - search `localhost:3000\` to visit home page
     - search `localhost:3000\favorite` to visit favorites page
-    - search `localhost:3000\` to visit home page
+    - search `localhost:3000\trending` to visit trending page
+    - search `localhost:3000\search` to visit search page
+    - search `localhost:3000\person` to visit person page
+
 
 
 ## Project Features
 <!-- What are the features included in you app -->
-errors handeling
+- viewing favorite,trending,search and person pages.
+- retrieving data from 3rd party API
