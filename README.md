@@ -3,7 +3,7 @@
 **Author Name**: Mohamad Shareef Naser
 
 ## WRRC
-![alt text](./images/lab12.PNG)
+![alt text](./images/lab13.PNG)
 ## Overview
 A movies library that provide data about movies, it also have a favorite page to keep your favorite movies in one place.
 ## Getting Started
@@ -17,6 +17,7 @@ A movies library that provide data about movies, it also have a favorite page to
     - search `localhost:3000\trending` to visit trending page
     - search `localhost:3000\search` to visit search page
     - search `localhost:3000\person` to visit person page
+    - search `localhost:3000\newmovies` to visit movies database page
 
 
 
