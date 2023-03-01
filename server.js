@@ -14,9 +14,11 @@ function TrendingMovie(id, title, release_date, poster_path, overview) {
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const pg = require('pg');
 const server = express();
 server.use(cors());
 server.use(errorHandler)
+server.use(express.json());
 const PORT = 3000;
 require('dotenv').config();
 
@@ -27,9 +29,12 @@ server.get('/favorite', favoriteHandler)
 server.get('/trending', trendingHandler)
 server.get('/search', searchHandler)
 server.get('/genres', genreHandler)
-server.get('/person',personHandler)
+server.get('/person', personHandler)
+server.get('/newmovies',getMoviesHandler)
+server.post('/newmovies',addNewMovieHandler)
 server.get('*', defaultHandler)
-
+// Objects
+const client = new pg.Client(process.env.DATABASE_URL);
 // Handlers functions
 function homeHandler(req, res) {
     const movieData = require('./Movie Data/data.json')
@@ -86,37 +91,64 @@ function searchHandler(req, res) {
 function genreHandler(req, res) {
     try {
         const api_key = process.env.api_key;
-        const url=`https://api.themoviedb.org/3/genre/movie/list?api_key=${api_key}&language=en-US`
+        const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${api_key}&language=en-US`
         axios.get(url)
-        .then((result)=>{return result.data})
-        .catch((err) => {
-            console.log("sorry", err);
-            res.status(500).send(err);
-        })
+            .then((result) => { return result.data })
+            .catch((err) => {
+                console.log("sorry", err);
+                res.status(500).send(err);
+            })
 
     }
-    catch (error){
-        errorHandler(error,req,res);
+    catch (error) {
+        errorHandler(error, req, res);
     }
 }
 
 function personHandler(req, res) {
     try {
         const api_key = process.env.api_key;
-        const id=4;
-        const url=`https://api.themoviedb.org/3/person/${id}?api_key=${api_key}&language=en-US`
+        const id = 4;
+        const url = `https://api.themoviedb.org/3/person/${id}?api_key=${api_key}&language=en-US`
         axios.get(url)
-        .then((result)=>{return result.data})
-        .catch((err) => {
-            console.log("sorry", err);
-            res.status(500).send(err);
-        })
+            .then((result) => { return result.data })
+            .catch((err) => {
+                console.log("sorry", err);
+                res.status(500).send(err);
+            })
 
     }
-    catch (error){
-        errorHandler(error,req,res);
+    catch (error) {
+        errorHandler(error, req, res);
     }
 }
+function getMoviesHandler (req,res){
+    try{
+        const sql= `SELECT * FROM new_movies`;
+        client.query(sql,values)
+        .then ((data)=>{
+            res.send(data.rows);
+        })
+    }
+    catch (error) {
+        errorHandler (error,req, res);
+    }
+}
+function addNewMovieHandler(req,res)
+{
+    const movie = req.body;
+    const sql = `INSERT INTO new_movies (movie_name,movie_comments) VALUES ($1,$2) RETURNING *`;
+    const values = [movie.title,movie.overview];
+    client.query(sql,values)
+    .then((data) => {
+        res.send("your data was added !");
+    })
+        .catch(error => {
+            // console.log(error);
+            errorHandler(error, req, res);
+        });
+}
+
 
 
 
@@ -132,6 +164,13 @@ function errorHandler(error, req, res, next) {
 }
 
 //http://localhost:3000/
-server.listen(PORT, () => {
-    console.log(`listening on ${PORT}`);
+client.connect()
+.then(()=>{
+    server.listen(PORT, () => {
+        console.log(`listening on ${PORT}`);
+    })    
+})
+.catch((err) => {
+    console.log("sorry", err);
+    res.status(500).send(err);
 })
