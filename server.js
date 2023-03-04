@@ -30,8 +30,12 @@ server.get('/trending', trendingHandler)
 server.get('/search', searchHandler)
 server.get('/genres', genreHandler)
 server.get('/person', personHandler)
-server.get('/newmovies',getMoviesHandler)
-server.post('/newmovies',addNewMovieHandler)
+server.get('/newmovies', getMoviesHandler)
+server.post('/newmovies', addNewMovieHandler)
+server.delete('/newmovies/:id', deleteMovieHandler)
+server.delete('/newmovies:/id', updateMovieHandler)
+server.get('/newmovies:/id', getNewMovieHandler)
+
 server.get('*', defaultHandler)
 // Objects
 const client = new pg.Client(process.env.DATABASE_URL);
@@ -122,33 +126,82 @@ function personHandler(req, res) {
         errorHandler(error, req, res);
     }
 }
-function getMoviesHandler (req,res){
-    try{
-        const sql= `SELECT * FROM new_movies`;
-        client.query(sql,values)
-        .then ((data)=>{
-            res.send(data.rows);
-        })
+function getMoviesHandler(req, res) {
+    try {
+        const sql = `SELECT * FROM new_movies`;
+        client.query(sql, values)
+            .then((data) => {
+                res.send(data.rows);
+            })
     }
     catch (error) {
-        errorHandler (error,req, res);
+        errorHandler(error, req, res);
     }
 }
-function addNewMovieHandler(req,res)
-{
-    const movie = req.body;
-    const sql = `INSERT INTO new_movies (movie_name,movie_comments) VALUES ($1,$2) RETURNING *`;
-    const values = [movie.title,movie.overview];
-    client.query(sql,values)
-    .then((data) => {
-        res.send("your data was added !");
-    })
-        .catch(error => {
-            // console.log(error);
-            errorHandler(error, req, res);
-        });
-}
+function addNewMovieHandler(req, res) {
+    try {
+        const movie = req.body;
+        const sql = `INSERT INTO new_movies (movie_name,movie_comments) VALUES ($1,$2) RETURNING *`;
+        const values = [movie.title, movie.overview];
+        client.query(sql, values)
+            .then((data) => {
+                res.send("your data was added !");
+            })
+            .catch(error => {
+                // console.log(error);
+                errorHandler(error, req, res);
+            });
 
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+
+}
+function deleteMovieHandler(req, res) {
+    try {
+        const id = req.params.id;
+        const sql = `DELETE FROM movies WHERE id=${id}`;
+        client.query(sql)
+            .then((data) => {
+                res.status(204).json({});
+            })
+            .catch((err) => {
+                errorHandler(err, req, res);
+            })
+
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+function updateMovieHandler(req, res) {
+    try {
+        const id = req.params.id;
+        const sql = `UPDATE movies SET movie_comments=$1 WHERE id=${id} RETURNING *`;
+        const values = [movie.overview];
+        client.query(sql, values)
+            .then((data) => {
+                res.status(200).send(data.rows);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+function getNewMovieHandler(req, res) {
+    try {
+        const id = req.params.id;
+        const sql = `SELECT * FROM new_movies WHERE id=${id} RETURNING *`;
+        client.query(sql, values)
+            .then((data) => {
+                res.send(data.rows);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
 
 
 
@@ -165,12 +218,12 @@ function errorHandler(error, req, res, next) {
 
 //http://localhost:3000/
 client.connect()
-.then(()=>{
-    server.listen(PORT, () => {
-        console.log(`listening on ${PORT}`);
-    })    
-})
-.catch((err) => {
-    console.log("sorry", err);
-    res.status(500).send(err);
-})
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`listening on ${PORT}`);
+        })
+    })
+    .catch((err) => {
+        console.log("sorry", err);
+        res.status(500).send(err);
+    })
