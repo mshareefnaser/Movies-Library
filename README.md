@@ -17,7 +17,7 @@ A movies library that provide data about movies, it also have a favorite page to
     - search `localhost:3000\trending` to visit trending page
     - search `localhost:3000\search` to visit search page
     - search `localhost:3000\person` to visit person page
-    - search `localhost:3000\newmovies` to visit movies database page
+    - search `localhost:3000\newmovies` to visit interact with db (CRUD)
 
 
 
