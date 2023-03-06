@@ -19,7 +19,7 @@ const server = express();
 server.use(cors());
 server.use(errorHandler)
 server.use(express.json());
-const PORT = 3000;
+const PORT = process.env.PORT|| 3000;
 require('dotenv').config();
 
 // Routes
@@ -41,7 +41,7 @@ server.get('*', defaultHandler)
 const client = new pg.Client(process.env.DATABASE_URL);
 // Handlers functions
 function homeHandler(req, res) {
-    const movieData = require('./Movie Data/data.json')
+    const movieData = require('./data.json')
     const spiderMan = new Movie(movieData.title, movieData.poster_path, movieData.overview);
     res.send(spiderMan);
 }
