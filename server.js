@@ -31,6 +31,7 @@ server.get('/search', searchHandler)
 server.get('/genres', genreHandler)
 server.get('/person', personHandler)
 server.get('/newmovies', getMoviesHandler)
+server.post('/newmovies', addNewMovieHandler)
 server.delete('/newmovies/:id', deleteMovieHandler)
 server.put('/newmovies:/id', updateMovieHandler)
 server.get('/newmovies:/id', getNewMovieHandler)
@@ -79,7 +80,7 @@ function searchHandler(req, res) {
         const query_value = "man";
         const url = `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&language=en-US&query=${query_value}&page=2`
         axios.get(url)
-            .then((result) => { return result.data })
+            .then((result) => { res.send(result.data) })
             .catch((err) => {
                 console.log("sorry", err);
                 res.status(500).send(err);
@@ -96,7 +97,7 @@ function genreHandler(req, res) {
         const api_key = process.env.api_key;
         const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${api_key}&language=en-US`
         axios.get(url)
-            .then((result) => { return result.data })
+            .then((result) => { res.send(result.data) })
             .catch((err) => {
                 console.log("sorry", err);
                 res.status(500).send(err);
@@ -114,7 +115,7 @@ function personHandler(req, res) {
         const id = 4;
         const url = `https://api.themoviedb.org/3/person/${id}?api_key=${api_key}&language=en-US`
         axios.get(url)
-            .then((result) => { return result.data })
+            .then((result) => { res.send(result.data) })
             .catch((err) => {
                 console.log("sorry", err);
                 res.status(500).send(err);
