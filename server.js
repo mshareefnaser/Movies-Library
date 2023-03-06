@@ -19,7 +19,7 @@ const server = express();
 server.use(cors());
 server.use(errorHandler)
 server.use(express.json());
-const PORT = process.env.PORT|| 3000;
+const PORT = process.env.PORT || 3000;
 require('dotenv').config();
 
 // Routes
@@ -33,8 +33,8 @@ server.get('/person', personHandler)
 server.get('/newmovies', getMoviesHandler)
 server.post('/newmovies', addNewMovieHandler)
 server.delete('/newmovies/:id', deleteMovieHandler)
-server.put('/newmovies:/id', updateMovieHandler)
-server.get('/newmovies:/id', getNewMovieHandler)
+server.put('/newmovies/:id', updateMovieHandler)
+server.get('/newmovies/:id', getNewMovieHandler)
 
 server.get('*', defaultHandler)
 // Objects
@@ -129,7 +129,7 @@ function personHandler(req, res) {
 function getMoviesHandler(req, res) {
     try {
         const sql = `SELECT * FROM new_movies`;
-        client.query(sql, values)
+        client.query(sql)
             .then((data) => {
                 res.send(data.rows);
             })
@@ -142,7 +142,7 @@ function addNewMovieHandler(req, res) {
     try {
         const movie = req.body;
         const sql = `INSERT INTO new_movies (movie_name,movie_comments) VALUES ($1,$2) RETURNING *`;
-        const values = [movie.title, movie.overview];
+        const values = [movie.movie_name, movie.movie_comments];
         client.query(sql, values)
             .then((data) => {
                 res.send("your data was added !");
@@ -161,7 +161,7 @@ function addNewMovieHandler(req, res) {
 function deleteMovieHandler(req, res) {
     try {
         const id = req.params.id;
-        const sql = `DELETE FROM movies WHERE id=${id}`;
+        const sql = `DELETE FROM movies WHERE movie_id=${id}`;
         client.query(sql)
             .then((data) => {
                 res.status(204).json({});
@@ -178,11 +178,15 @@ function deleteMovieHandler(req, res) {
 function updateMovieHandler(req, res) {
     try {
         const id = req.params.id;
-        const sql = `UPDATE movies SET movie_comments=$1 WHERE id=${id} RETURNING *`;
-        const values = [movie.overview];
+        const movie = req.body;
+        const sql = `UPDATE movies SET movie_name=$1, movie_comments=$2 WHERE movie_id=${id}`;
+        const values = [movie.movie_name,movie.movie_comments];
         client.query(sql, values)
             .then((data) => {
                 res.status(200).send(data.rows);
+            })
+            .catch((err) => {
+                errorHandler(err, req, res);
             })
     }
     catch (error) {
@@ -190,12 +194,16 @@ function updateMovieHandler(req, res) {
     }
 }
 function getNewMovieHandler(req, res) {
+   
     try {
         const id = req.params.id;
-        const sql = `SELECT * FROM new_movies WHERE id=${id} RETURNING *`;
-        client.query(sql, values)
+        const sql = `SELECT * FROM new_movies WHERE movie_id=${id}`;
+        client.query(sql)
             .then((data) => {
                 res.send(data.rows);
+            })
+            .catch((err) => {
+                errorHandler(err, req, res);
             })
     }
     catch (error) {
