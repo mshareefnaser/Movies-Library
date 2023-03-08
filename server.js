@@ -161,7 +161,7 @@ function addNewMovieHandler(req, res) {
 function deleteMovieHandler(req, res) {
     try {
         const id = req.params.id;
-        const sql = `DELETE FROM movies WHERE movie_id=${id}`;
+        const sql = `DELETE FROM new_movies WHERE movie_id=${id}`;
         client.query(sql)
             .then((data) => {
                 res.status(204).json({});
@@ -179,7 +179,7 @@ function updateMovieHandler(req, res) {
     try {
         const id = req.params.id;
         const movie = req.body;
-        const sql = `UPDATE movies SET movie_name=$1, movie_comments=$2 WHERE movie_id=${id}`;
+        const sql = `UPDATE new_movies SET movie_name=$1, movie_comments=$2 WHERE movie_id=${id}`;
         const values = [movie.movie_name,movie.movie_comments];
         client.query(sql, values)
             .then((data) => {
