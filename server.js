@@ -141,8 +141,8 @@ function getMoviesHandler(req, res) {
 function addNewMovieHandler(req, res) {
     try {
         const movie = req.body;
-        const sql = `INSERT INTO new_movies (movie_name,movie_comments) VALUES ($1,$2) RETURNING *`;
-        const values = [movie.movie_name, movie.movie_comments];
+        const sql = `INSERT INTO new_movies (movie_name,movie_comments,movie_overview,poster_path,release_date) VALUES ($1,$2,$3,$4,$5) RETURNING *`;
+        const values = [movie.movie_name, movie.movie_comments,movie.movie_overview,movie.poster_path,movie.release_date];
         client.query(sql, values)
             .then((data) => {
                 res.send("your data was added !");
