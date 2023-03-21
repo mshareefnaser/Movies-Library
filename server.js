@@ -179,8 +179,8 @@ function updateMovieHandler(req, res) {
     try {
         const id = req.params.id;
         const movie = req.body;
-        const sql = `UPDATE new_movies SET movie_name=$1, movie_comments=$2 WHERE movie_id=${id}`;
-        const values = [movie.movie_name,movie.movie_comments];
+        const sql = `UPDATE new_movies SET movie_name=$1, movie_comments=$2,movie_overview=$3,poster_path=$4,release_date=$5  WHERE movie_id=${id}`;
+        const values = [movie.movie_name, movie.movie_comments,movie.movie_overview,movie.poster_path,movie.release_date];
         client.query(sql, values)
             .then((data) => {
                 res.status(200).send(data.rows);
